@@ -1,0 +1,36 @@
+[project]
+name = "baselines"
+version = "0.1.0"
+description = "Ray-based train + eval orchestrator for VLM data curation baselines"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "ray==2.53.0",
+    "torch>=2.1.2",
+    "torchvision",
+    "transformers>=4.45,<5",
+    "datasets",
+    "pillow",
+    "accelerate",
+    "deepspeed",
+    "pyyaml",
+    "qwen-vl-utils",
+    "liger-kernel>=0.5.0",
+    "flash-attn>=2.0",
+    "huggingface_hub",
+    "packaging",
+    "setuptools>=82.0.0",
+    "faiss-cpu>=1.13.2",
+]
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+flash-attn = { url = "https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.0/flash_attn-2.8.3+cu128torch2.10-cp311-cp311-linux_x86_64.whl" }
+
+[tool.uv]
+package = false
