@@ -210,7 +210,7 @@ def main() -> None:
     p_run = sub.add_parser("run", help="Run benchmark agent in Docker container")
     p_run.add_argument(
         "agent",
-        choices=["claude", "claude-deepseek", "codex", "openhands-kimi", "openhands-qwen"],
+        choices=["claude", "codex", "openhands-kimi", "openhands-qwen"],
         help="Agent to run",
     )
     p_run.add_argument("--profile", default=None, help="Profile name or path")

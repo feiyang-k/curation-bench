@@ -55,22 +55,6 @@ _AGENTS: dict[str, dict[str, Any]] = {
         "creds_src": ".claude/.credentials.json",
         "creds_dst": "/home/agent/.claude/.credentials.json",
     },
-    # DeepSeek-routed Claude Code: same CLI, but the image bakes in
-    # ANTHROPIC_BASE_URL/ANTHROPIC_AUTH_TOKEN pointing at DeepSeek's
-    # Anthropic-compatible API. No host credential mount.
-    "claude-deepseek": {
-        "dockerfile": "claude-deepseek.Dockerfile",
-        "tag": "datacuration-bench-claude-deepseek:latest",
-        "cmd": (
-            _PASSWD_FIX +
-            'cd /workspace && claude -p "$(cat {prompt_path})" '
-            "--dangerously-skip-permissions "
-            "--max-turns {max_turns} "
-            "--verbose "
-            "--output-format stream-json "
-            "2>&1 | tee /workspace/output/run.jsonl"
-        ),
-    },
     "codex": {
         "dockerfile": "codex.Dockerfile",
         "tag": "datacuration-bench-codex:latest",
@@ -169,16 +153,11 @@ def _apply_agent_env(env: dict, agent: str, agent_cfg: dict) -> None:
     Codex model/effort go through CLI flags (see _build_cmd_kwargs).
     OpenHands reads LLM_* env vars via `--override-with-envs`.
     """
-    if agent in ("claude", "claude-deepseek"):
+    if agent == "claude":
         if agent_cfg.get("model"):
             env["ANTHROPIC_MODEL"] = str(agent_cfg["model"])
         if agent_cfg.get("effort"):
             env["CLAUDE_CODE_EFFORT_LEVEL"] = str(agent_cfg["effort"])
-    if agent == "claude-deepseek":
-        # The DeepSeek image bakes in ANTHROPIC_AUTH_TOKEN. Drop any host
-        # Anthropic OAuth token that _build_env passed through, otherwise
-        # Claude Code may prefer it and route to api.anthropic.com instead.
-        env.pop("CLAUDE_CODE_OAUTH_TOKEN", None)
     if agent.startswith("openhands"):
         # OpenHands routes inference through Together AI via LiteLLM. The
         # `together_ai/` prefix tells LiteLLM which provider to use.
