@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.coverage
+.coverage.*
+htmlcov/
+
+# Environments
+.venv/
+venv/
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Benchmark temp
+.bench_active_suite
+.workspaces/
+runs/
+output/
+logs/
+nohup.out
+*.nohup.out
+*.log
+
+# Jupyter / notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE / editor / agent tooling
+.claude/
+.codex/
+.openhands/
+.DS_Store
+*.swp
+*.swo
+
+# Secrets
+.env
+profiles/*.yaml
+!profiles/example.yaml
+
+# Large binary artifacts (keep run metadata, skip huge data files)
+*.arrow
+*.safetensors
+*.bin
+*.pt
+*.ckpt

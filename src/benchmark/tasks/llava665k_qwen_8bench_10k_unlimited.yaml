@@ -1,0 +1,39 @@
+task:
+  task_id: llava665k_qwen_8bench_10k_unlimited
+  goal: >
+    Select the best 10,000 samples from LLaVA-665K for Qwen2.5-VL-3B
+    to maximize average performance across 8 benchmarks:
+    HallusionBench, LLaVABench, MMBench, MMMU_DEV_VAL, MMStar, MMVet,
+    MathVista_MINI, OCRBench.
+  target_rows: 10000
+  training_stage: posttraining
+  model_key: qwen2.5-vl-3b-instruct
+  model_name_or_path: __MODEL_PATH__
+  target_evals:
+    - HallusionBench
+    - LLaVABench
+    - MMBench
+    - MMMU_DEV_VAL
+    - MMStar
+    - MMVet
+    - MathVista_MINI
+    - OCRBench
+  strategy_timeout_seconds: null
+  eval_data_dir: __EVAL_DATA_DIR__
+  default_submission_dir: curated/final_submission
+  training_config:
+    num_processes: 2
+    timeout_seconds: 36000
+  eval_config:
+    judge_model: Qwen3.5-27B
+    timeout_seconds: 28800
+    use_vllm: true
+    mode: all
+    api_nproc: 4
+    gpu_id: 0
+  dataset:
+    dataset_id: llava665k
+    local_path: __DATASET_PATH__
+    split: null
+    image_column: images
+    text_column: texts

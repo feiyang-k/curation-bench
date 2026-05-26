@@ -1,0 +1,83 @@
+# Docker runner configuration for datacuration benchmark.
+# Dataset/model/eval/GPU settings come from the profile;
+# this file only has container-specific settings.
+
+# Container-only env vars (not in profile)
+env:
+  CUDA_HOME: /usr/local/cuda
+  CC: /usr/bin/gcc
+  PYTHONUNBUFFERED: "1"
+
+mounts:
+  # Host symlinks resolve to these paths; container must see them at the same
+  # location for runs/, models/, datasets/* to work inside the container.
+  - src: /path/to/data-curation
+    dst: /path/to/data-curation
+    mode: rw
+  - src: /path/to/datasets
+    dst: /path/to/datasets
+    mode: ro
+
+agents:
+  # Claude Code: model/effort are injected as env vars (ANTHROPIC_MODEL, CLAUDE_CODE_EFFORT_LEVEL).
+  # Full model names (source: https://platform.claude.com/docs/en/about-claude/models/overview):
+  #   claude-opus-4-7       # current 'opus' alias (latest Opus)
+  #   claude-opus-4-6       # prior Opus, still supported
+  #   claude-sonnet-4-6     # current 'sonnet' alias
+  #   claude-haiku-4-5      # current 'haiku' alias (resolves to -20251001 snapshot)
+  #   claude-opus-4-5-20251101        # legacy snapshot
+  #   claude-opus-4-1-20250805        # legacy snapshot
+  #   claude-sonnet-4-5-20250929      # legacy Sonnet 4.5
+  #   claude-sonnet-4-20250514        # deprecated, retires 2026-06-15
+  #   claude-opus-4-20250514          # deprecated, retires 2026-06-15
+  # Effort levels (source: claude --help + Claude Code docs):
+  #   low / medium / high / xhigh / max
+  #   (xhigh only on Opus 4.7; Opus 4.6 and Sonnet 4.6 max-out at 'max' without xhigh)
+  claude:
+    max_turns: 5000
+    model: "claude-opus-4-6"
+    effort: "high"
+
+  # Codex: model/effort are injected as CLI flags (-m, -c model_reasoning_effort=).
+  # Full model names (source: https://developers.openai.com/codex/models):
+  #   gpt-5.4                # flagship frontier reasoning + coding
+  #   gpt-5.4-mini           # lightweight variant of 5.4
+  #   gpt-5.3-codex          # coding-specialized, best for software engineering tasks
+  #   gpt-5.3-codex-spark    # research preview (ChatGPT Pro only)
+  #   gpt-5.2                # previous general-purpose
+  # Effort levels (source: OpenAI reasoning API):
+  #   minimal / low / medium / high
+  codex:
+    model: "gpt-5.4"
+    effort: "high"
+
+  # OpenHands routed through Together AI (LiteLLM `together_ai/` prefix).
+  # Requires TOGETHER_API_KEY exported in host shell; passed through to
+  # the container as LLM_API_KEY (see docker_runner._apply_agent_env).
+  # Verified models (source: https://api.together.ai/models):
+  #   moonshotai/Kimi-K2-Instruct           # verified
+  #   Qwen/Qwen3.5-397B-A17B                # verified (serverless)
+  #   Qwen/Qwen3-Coder-480B-A35B-Instruct   # needs dedicated endpoint, skip
+  #   deepseek-ai/DeepSeek-V4-Pro           # works only with native_tools=false
+  # native_tools=true for Kimi/Qwen; set false for models that need prompted
+  # tool calling (e.g. DeepSeek-V4-Pro).
+  openhands-kimi:
+    max_turns: 5000
+    # Kimi K2.5 verified serverless on Together AI (model card lists Serverless
+    # first under deployment options). Non-streaming; tool calls parse cleanly.
+    # Note: NO `-Instruct` suffix in the model ID.
+    model: "moonshotai/Kimi-K2.5"
+    native_tools: true
+
+  openhands-qwen:
+    max_turns: 5000
+    model: "Qwen/Qwen3.5-397B-A17B"
+    # native_tools=false: Together AI's Qwen3.5 serverless endpoint does not
+    # reliably return OpenAI-compatible function_call JSON; under long context
+    # it emits XML-style tool calls inline (multiple malformed shapes — see
+    # the reverted openhands_xml_fallback_patch.py history). Setting this to
+    # false makes OpenHands prompt-mock tool calls: it injects the tool schema
+    # + a format example into the prompt and parses the response with its own
+    # fn_call_converter — a controlled format instead of relying on Qwen's
+    # flaky provider-side parser.
+    native_tools: false

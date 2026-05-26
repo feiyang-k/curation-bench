@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "curation-bench"
+version = "0.3.0"
+description = "Curation-Bench: a fixed-flow benchmark for dataset-curation agents with CLI tools, post-submission training, and evaluation."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [{name = "Anonymous"}]
+keywords = ["benchmark", "dataset-curation", "multimodal", "agents"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Testing",
+]
+dependencies = [
+  "datasets>=4.6.0",
+  "PyYAML>=6.0.1",
+  "Pillow>=10.0.0",
+  "uv>=0.8.0",
+  "docker>=7.0",
+]
+
+# [project.urls]
+# Homepage = "https://example.invalid/curation-bench"
+# Repository = "https://example.invalid/curation-bench"
+# Issues = "https://example.invalid/curation-bench/issues"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+datacuration-bench = "benchmark.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
