@@ -327,9 +327,6 @@ tail -f logs/codex-instruction-llava-665k.log
 
 When the suite finishes, the per-iteration JSON results are written under `runs/<timestamp>_<agent>/<task_id>_iter*/eval/results/results.json` (see [Run Output Layout](#run-output-layout)).
 
-#### Running multiple tasks/agents in parallel
-
-You can launch more than one suite at once **as long as their profiles pin disjoint GPUs**. For example, give one profile `CUDA_VISIBLE_DEVICES="0,1"` and another `CUDA_VISIBLE_DEVICES="2,3"`, then launch each in its own backgrounded `nohup`. The harness writes each suite into a separate `runs/<timestamp>_<agent>/` directory, so they don't collide.
 
 ---
 
@@ -396,16 +393,7 @@ The test suite covers profile parsing, suite-state transitions, the Docker runne
 
 ---
 
-## Troubleshooting
 
-- **`Cannot resolve dataset path for task X (dataset_id=Y)`** — `Y` isn't in your profile's `dataset_path_map`. Add it.
-- **`Cannot resolve model path for task X (model_key=Y)`** — same, but `model_path_map` / `model_key`.
-- **`permission denied: /var/run/docker.sock`** (OpenHands only) — add your host user to the `docker` group, or run with `sudo`.
-- **Training appears to hang with no `train_runtime` line** — usually GPU memory. SmolVLM uses per-device batch 16, LLaVA uses 1×16-accum, both at bf16; see `vendor/curation-train/src/curation_train/defaults.py` for the full recipes.
-- **VLMEvalKit can't reach the judge** — from inside the container, `localhost` is the container itself. Use `host.docker.internal` (Docker Desktop / recent Linux Docker) or your host's LAN IP, and make sure `OPENAI_API_BASE` ends in `/v1` (not `/v1/chat/completions`).
-- **Out-of-memory during eval** — bring up the judge on a separate GPU and assign it via `BENCHMARK_EVAL_GPUS` in the profile.
-
----
 
 ## License
 
