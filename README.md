@@ -37,7 +37,7 @@ Per-iteration scores land in `runs/<timestamp>/suite_state.json`; final results 
 
 ## Built-in Tasks
 
-Nine task YAMLs under `src/benchmark/tasks/`. All evaluate on eight benchmarks: HallusionBench, LLaVABench, MMBench, MMMU_DEV_VAL, MMStar, MMVet, MathVista_MINI, OCRBench.
+Eight task YAMLs under `src/benchmark/tasks/`. All evaluate on eight benchmarks: HallusionBench, LLaVABench, MMBench, MMMU_DEV_VAL, MMStar, MMVet, MathVista_MINI, OCRBench.
 
 | Task ID | Dataset | Model | Select | Strategy Timeout |
 |---|---|---|---|---|
@@ -47,7 +47,6 @@ Nine task YAMLs under `src/benchmark/tasks/`. All evaluate on eight benchmarks: 
 | `llava665k_qwen_8bench_10k_unlimited` | LLaVA-665K | Qwen2.5-VL-3B-Instruct | 10K | unlimited |
 | `llava665k_qwen2vl2b_8bench_10k_unlimited` | LLaVA-665K | Qwen2-VL-2B | 10K | unlimited |
 | `llava665k_smolvlm_8bench_10k_unlimited` | LLaVA-665K | SmolVLM-Base (2.2B) | 10K | unlimited |
-| `llava665k_smolvlm500m_8bench_10k_unlimited` | LLaVA-665K | SmolVLM-500M-Base | 10K | unlimited |
 | `visionflan_llava_8bench_20k_unlimited` | VisionFlan | LLaVA-1.5-7B | 20K | unlimited |
 | `visionflan_smolvlm_8bench_10k_unlimited` | VisionFlan | SmolVLM-Base (2.2B) | 10K | unlimited |
 
@@ -124,12 +123,12 @@ The benchmark expects HuggingFace Arrow datasets saved via `datasets.save_to_dis
 
 | `dataset_id` (profile key) | Source | On-disk size | Used by |
 |---|---|---|---|
-| `llava665k` | LLaVA-1.5 visual-instruction-tuning data, repacked as a 665K-row Arrow dataset | ~500 GB | 7 of 9 tasks |
-| `visionflan` | [`Vision-Flan/Vision-Flan_jsons_split`](https://huggingface.co/datasets/Vision-Flan/Vision-Flan_jsons_split) repacked into the same `(images, texts)` schema | ~300 GB | 2 of 9 tasks |
+| `llava665k` | LLaVA-1.5 visual-instruction-tuning data, repacked as a 665K-row Arrow dataset | ~500 GB | 6 of 8 tasks |
+| `visionflan` | [`Vision-Flan/Vision-Flan_jsons_split`](https://huggingface.co/datasets/Vision-Flan/Vision-Flan_jsons_split) repacked into the same `(images, texts)` schema | ~300 GB | 2 of 8 tasks |
 
 Place each dataset wherever you have room and remember the path; you'll wire it up in your profile in Step 5. If you only need one task family, you only need that family's dataset.
 
-> **Tip:** if you already have raw LLaVA / VisionFlan jsons, you can convert them to the expected Arrow layout with a small script — `analyze_subsets.py` in this repo gives a working example of the read side.
+> **Tip:** if you already have raw LLaVA / VisionFlan jsons, you can convert them to the expected Arrow layout with a small script using `datasets.Dataset.save_to_disk`. The exact column shapes the harness expects are documented in `vendor/curation-train/src/curation_train/train_smolvlm.py` (`_as_pil_image()` and `_normalize_turns()`).
 
 ### Step 3 — Download the base models
 
@@ -139,7 +138,7 @@ Place each dataset wherever you have room and remember the path; you'll wire it 
 | `qwen2.5-vl-3b-instruct` | `Qwen/Qwen2.5-VL-3B-Instruct` | `llava665k_qwen_8bench_10k_unlimited` |
 | `qwen2-vl-2b` | `Qwen/Qwen2-VL-2B` | `llava665k_qwen2vl2b_8bench_10k_unlimited` |
 | `smolvlm` | `HuggingFaceTB/SmolVLM-Base` (2.2B) | SmolVLM 2.2B tasks |
-| `smolvlm-500m` | `HuggingFaceTB/SmolVLM-500M-Base` | `*_smolvlm500m_*` |
+| `smolvlm-500m` | `HuggingFaceTB/SmolVLM-500M-Base` | supported but not in the default task set |
 | `smolvlm-256m` | `HuggingFaceTB/SmolVLM-256M-Base` | supported but not in the default task set |
 
 A typical download:
