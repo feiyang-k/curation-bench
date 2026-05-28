@@ -121,10 +121,10 @@ The benchmark expects HuggingFace Arrow datasets saved via `datasets.save_to_dis
 - `images` — `PIL.Image` or a `{bytes, path}` dict
 - `texts` — a list of `{user, assistant}` turns
 
-| `dataset_id` (profile key) | Source | On-disk size | Used by |
-|---|---|---|---|
-| `llava665k` | LLaVA-1.5 visual-instruction-tuning data, repacked as a 665K-row Arrow dataset | ~500 GB | 6 of 8 tasks |
-| `visionflan` | [`Vision-Flan/Vision-Flan_jsons_split`](https://huggingface.co/datasets/Vision-Flan/Vision-Flan_jsons_split) repacked into the same `(images, texts)` schema | ~300 GB | 2 of 8 tasks |
+| `dataset_id` (profile key) | Source |
+|---|---|
+| `llava665k` | LLaVA-1.5 visual-instruction-tuning data, repacked as a 665K-row Arrow dataset |
+| `visionflan` | [`Vision-Flan/Vision-Flan_jsons_split`](https://huggingface.co/datasets/Vision-Flan/Vision-Flan_jsons_split) repacked into the same `(images, texts)` schema |
 
 Place each dataset wherever you have room and remember the path; you'll wire it up in your profile in Step 5. If you only need one task family, you only need that family's dataset.
 
@@ -138,8 +138,6 @@ Place each dataset wherever you have room and remember the path; you'll wire it 
 | `qwen2.5-vl-3b-instruct` | `Qwen/Qwen2.5-VL-3B-Instruct` | `llava665k_qwen_8bench_10k_unlimited` |
 | `qwen2-vl-2b` | `Qwen/Qwen2-VL-2B` | `llava665k_qwen2vl2b_8bench_10k_unlimited` |
 | `smolvlm` | `HuggingFaceTB/SmolVLM-Base` (2.2B) | SmolVLM 2.2B tasks |
-| `smolvlm-500m` | `HuggingFaceTB/SmolVLM-500M-Base` | supported but not in the default task set |
-| `smolvlm-256m` | `HuggingFaceTB/SmolVLM-256M-Base` | supported but not in the default task set |
 
 A typical download:
 
@@ -202,7 +200,6 @@ model_path_map:
   qwen2.5-vl-3b-instruct:  /data/models/Qwen2.5-VL-3B-Instruct
   qwen2-vl-2b:             /data/models/Qwen2-VL-2B
   smolvlm:                 /data/models/SmolVLM-Base
-  smolvlm-500m:            /data/models/SmolVLM-500M-Base
 
 eval_data_dir: /data/LMUData
 
