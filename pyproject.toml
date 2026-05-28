@@ -8,13 +8,11 @@ version = "0.3.0"
 description = "Curation-Bench: a fixed-flow benchmark for dataset-curation agents with CLI tools, post-submission training, and evaluation."
 readme = "README.md"
 requires-python = ">=3.12"
-license = {text = "MIT"}
 authors = [{name = "Anonymous"}]
 keywords = ["benchmark", "dataset-curation", "multimodal", "agents"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",

@@ -390,9 +390,3 @@ uv run pytest -q
 ```
 
 The test suite covers profile parsing, suite-state transitions, the Docker runner config, contamination detection, and basic evaluation plumbing. See `tests/` for the full layout.
-
----
-
-## License
-
-Released under the MIT License — see [`LICENSE`](LICENSE).
