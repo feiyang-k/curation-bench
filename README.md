@@ -123,8 +123,8 @@ The benchmark expects HuggingFace Arrow datasets saved via `datasets.save_to_dis
 
 | `dataset_id` (profile key) | Source |
 |---|---|
-| `llava665k` | LLaVA-1.5 visual-instruction-tuning data, repacked as a 665K-row Arrow dataset |
-| `visionflan` | [`Vision-Flan/Vision-Flan_jsons_split`](https://huggingface.co/datasets/Vision-Flan/Vision-Flan_jsons_split) repacked into the same `(images, texts)` schema |
+| `llava665k` |  |
+| `visionflan` |  |
 
 Place each dataset wherever you have room and remember the path; you'll wire it up in your profile in Step 5. If you only need one task family, you only need that family's dataset.
 
