@@ -107,7 +107,7 @@ Before running anything, make sure the host has:
 ### Step 1 — Clone and install the CLI
 
 ```bash
-git clone <repo-url> Curation-Bench
+git clone https://github.com/feiyang-k/curation-bench.git Curation-Bench
 cd Curation-Bench
 uv sync
 ```
