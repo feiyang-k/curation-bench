@@ -393,8 +393,6 @@ The test suite covers profile parsing, suite-state transitions, the Docker runne
 
 ---
 
-
-
 ## License
 
-*Not yet specified — coming soon.*
+Released under the MIT License — see [`LICENSE`](LICENSE).
