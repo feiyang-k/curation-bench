@@ -157,6 +157,18 @@ You only need the models that the tasks you plan to run actually use.
 mkdir -p /path/to/LMUData
 ```
 
+> **Recommended:** prefetch the eight TSVs **before** the first iteration so the *contamination audit* (which runs before any `eval`) can check the submission against all benchmarks instead of skipping the ones whose TSV is still missing. Either kick off one throwaway `datacuration-bench eval` on a checkpoint you don't care about, or pull the files directly:
+>
+> ```bash
+> cd /path/to/LMUData
+> for b in HallusionBench LLaVABench MMBench MMMU_DEV_VAL MMStar MMVet MathVista_MINI OCRBench; do
+>   curl -fL -o "${b}.tsv" "https://opencompass.openxlab.space/utils/VLMEval/${b}.tsv" || \
+>   curl -fL -o "${b}.tsv" "https://opencompass.openxlab.space/utils/benchmarks/MMBench/${b}.tsv"
+> done
+> ```
+>
+> Without this step the audit will still run, but `skipped_benchmarks` in its result will list every TSV that wasn't on disk yet.
+
 **Judge model.** Three of the eight benchmarks (LLaVABench, MMVet, MathVista_MINI) need an LLM judge. The default is `Qwen3.5-27B` served over an OpenAI-compatible endpoint. Two options:
 
 1. **Local vLLM** (recommended for cost). Reserve one GPU and serve:
@@ -272,18 +284,52 @@ Anything after the closing `---` is *strategy text*: free-form Markdown the agen
 
 ### Step 9 — Launch
 
+The minimal foreground command:
+
 ```bash
 uv run datacuration-bench run claude --profile my-machine
 ```
 
 Replace `claude` with `codex`, `openhands-kimi`, or `openhands-qwen` for the other agents. Useful flags:
 
-- `--protocol plain|instruction|skill` — which protocol document the agent reads (default `plain`).
+- `--prompt plain|instruction|skill` — which protocol document the agent reads (default `plain`).
 - `--rebuild` — force a fresh image build.
 - `--dry-run` — print the Docker invocation without executing.
 - `--new-suite` — discard `.bench_active_suite` and start a fresh run; without this flag, `run` resumes the existing active suite when possible.
 
 The launcher initializes the suite, builds the image if needed, and starts one Docker container per task. Each container walks all iterations of its assigned task and then exits.
+
+#### Long runs: backgrounded with a log file
+
+A single 11-iteration task can take hours, so most runs are launched as a backgrounded `nohup` process with stdout/stderr teed to a per-agent log:
+
+```bash
+mkdir -p logs
+
+# Codex agent, instruction protocol, llava665k+LLaVA 10k task
+nohup uv run datacuration-bench run codex --profile my-machine --prompt instruction \
+  > logs/codex-instruction-llava-665k.log 2>&1 &
+
+# Claude Code, plain protocol
+nohup uv run datacuration-bench run claude --profile my-machine --prompt plain \
+  > logs/claude-plain-llava-665k.log 2>&1 &
+
+# OpenHands via Together AI (Kimi), skill protocol
+nohup uv run datacuration-bench run openhands-kimi --profile my-machine --prompt skill \
+  > logs/openhands-kimi-skill-llava-665k.log 2>&1 &
+```
+
+Tail the log to watch progress:
+
+```bash
+tail -f logs/codex-instruction-llava-665k.log
+```
+
+When the suite finishes, the per-iteration JSON results are written under `runs/<timestamp>_<agent>/<task_id>_iter*/eval/results/results.json` (see [Run Output Layout](#run-output-layout)).
+
+#### Running multiple tasks/agents in parallel
+
+You can launch more than one suite at once **as long as their profiles pin disjoint GPUs**. For example, give one profile `CUDA_VISIBLE_DEVICES="0,1"` and another `CUDA_VISIBLE_DEVICES="2,3"`, then launch each in its own backgrounded `nohup`. The harness writes each suite into a separate `runs/<timestamp>_<agent>/` directory, so they don't collide.
 
 ---
 
