@@ -134,9 +134,9 @@
 
           <!-- Tagline -->
           <p class="is-size-5 publication-tagline">
-            An agent-centric benchmark for the data-curation loop &mdash; generalist coding agents
+            An agent-centric benchmark for the data-curation loop. Generalist coding agents
             match strong published baselines out of the box, but reliable data research takes
-            scaffolded method adaptation, not open-ended prompting.
+            scaffolded method adaptation rather than open-ended prompting.
           </p>
 
           <!-- Author list -->
@@ -266,7 +266,7 @@
           <div class="stat-number">33.7 &ge; 33.3 / 33.2</div>
           <div class="stat-label">
             Open-prompt agents reach the human-designed baselines ICONS (33.3) and ARDS (33.2)
-            at the same 10k budget &mdash; and the best (Claude Code) exceeds them.
+            at the same 10k budget. The best, Claude Code, exceeds them.
           </div>
         </div>
       </div>
@@ -275,8 +275,8 @@
         <div class="box stat-card has-text-centered">
           <div class="stat-number">2 of 10</div>
           <div class="stat-label">
-            Execution&ndash;research gap: in a typical open-prompt run, only ~2 of 10 iterations
-            try a new policy family &mdash; the rest are local source-ratio tuning.
+            Execution-research gap: in a typical open-prompt run, only ~2 of 10 iterations
+            try a new policy family. The rest are local source-ratio tuning.
           </div>
         </div>
       </div>
@@ -346,7 +346,7 @@
         <div class="content has-text-justified">
           <p>
             Data-centric benchmarks like DataComp fix the model, training recipe, and evaluation so
-            that data becomes the variable of interest &mdash; but the submitted artifact is a static
+            that data becomes the variable of interest, but the submitted artifact is a static
             policy, and the benchmark never sees how that policy was discovered or revised.
             Curation-Bench inherits DataComp's data-isolation principle but replaces static
             submission with an interactive terminal loop: the agent inspects the candidate pool,
@@ -355,7 +355,7 @@
             schedule, and evaluation suite (P1: data isolation), gives the agent a standard Dockerized
             terminal workspace (P2: terminal realism), audits every submitted dataset for evaluation
             leakage before training (P3: contamination control), and persists the full
-            trajectory &mdash; policy scripts, manifests, audit results, training outputs, and eval
+            trajectory: policy scripts, manifests, audit results, training outputs, and eval
             logs under a commit hash (P4: trajectory legibility). The main instantiation is multimodal
             instruction tuning (selecting 10k from LLaVA-665K to fine-tune LLaVA-1.5-7B, evaluated on
             8 benchmarks), with a smaller CLIP-style DataComp pretraining setting to show the loop is
@@ -369,7 +369,7 @@
           <p class="figure-caption">
             <b>Architecture of Curation-Bench.</b> A coding agent inspects the candidate pool,
             implements data policies, and submits curated datasets. The harness validates each
-            submission and scores it with a fixed training&ndash;evaluation pipeline.
+            submission and scores it with a fixed training and evaluation pipeline.
           </p>
         </div>
       </div>
@@ -387,7 +387,7 @@
           <p>
             Under open-ended prompting with no data-specific scaffolding, generalist coding agents
             reliably run the loop. Across more than 500 iterations in 50+ sessions, agents produced
-            fewer than 10 crashed iterations not attributable to external incidents &mdash; execution
+            fewer than 10 crashed iterations not attributable to external incidents. Execution
             is effectively solved. On the primary LLaVA-665K / LLaVA-1.5-7B task, every agent beats
             the best of 10 random runs, and most meet or exceed the published baselines ICONS (33.3)
             and ARDS (33.2). Claude Code (Opus 4.7) performs best at 33.7 (+1.2 over the best random run),
@@ -407,17 +407,17 @@
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-full-width">
-        <h2 class="title is-3">The execution&ndash;research gap</h2>
+        <h2 class="title is-3">The execution-research gap</h2>
         <div class="content has-text-justified">
           <p>
-            Strong scores mask a persistent execution&ndash;research gap. Trajectory diagnostics
+            Strong scores mask a persistent execution-research gap. Trajectory diagnostics
             label each iteration as introducing a new policy family, being grounded in evidence, being
             effective, or being a shallow local adjustment. A typical open-prompt Claude Code run
             scores well but is local and reactive: after an initial subset-balancing policy, most
-            later edits just shuffle source ratios &mdash; only 2 of 10 iterations introduce a new
+            later edits just shuffle source ratios. Only 2 of 10 iterations introduce a new
             policy family. The gap persists even when agents are given strategy lists and
-            paper-derived skill cards, indicating the bottleneck is not missing methodological
-            knowledge but a failure to operationalize it into executable policies. Light scaffolds
+            paper-derived skill cards. The agents have the methodological knowledge; they fail to
+            operationalize it into executable policies. Light scaffolds
             broaden the agent's vocabulary (new-policy moves rise to 43%, grounding to 70%) but do not
             move the best outcome beyond the open-prompt maximum of 34.0.
           </p>
@@ -430,7 +430,7 @@
             <b>Agentic data-curation results across scaffolds</b> (Claude Code, 10 iterations;
             LLaVA-1.5-7B fine-tuned on 10k from LLaVA-665K, 8 benchmarks). Compared to open-prompt,
             light scaffolds reduce outcome variance but do not improve the best outcome; heavy
-            scaffolds change the outcome substantially &mdash; for better or worse depending on the
+            scaffolds change the outcome substantially, for better or worse depending on the
             design, with Adapt-Papers reaching the best 34.9 policy.
           </p>
         </div>
@@ -452,13 +452,13 @@
             new-policy-family moves from 27% to 67%, grounded iterations from 57% to 100%, and drives
             shallow moves from 47% to 0%. After several failed adaptations, the agent autonomously
             moves into a training-dynamics family: it composes an EL2N-style top-loss selection policy
-            with a p95 assistant-loss noise filter that removes the top ~5% noisiest responses &mdash;
-            a hybrid loss-based policy no human designed. This reaches a best 10k score of 34.9,
+            with a p95 assistant-loss noise filter that removes the top ~5% noisiest responses.
+            No human designed this hybrid loss-based policy. This reaches a best 10k score of 34.9,
             beating the open-prompt agent and the 100k non-agent baselines ICONS-100k (34.5) and
-            ARDS-100k (34.1) at one-tenth their data budget. Crucially, this scaffold has only 20%
-            locally effective iterations &mdash; fewer immediate gains &mdash; yet reaches a
-            higher-upside region of the policy space, which is exactly why trajectory diagnostics, not
-            just final scores, are needed.
+            ARDS-100k (34.1) at one-tenth their data budget. This scaffold has only 20%
+            locally effective iterations, so it produces fewer immediate gains, yet it reaches a
+            higher-upside region of the policy space. Trajectory diagnostics capture that difference;
+            final scores alone would not.
           </p>
         </div>
       </div>
@@ -474,17 +474,17 @@
         <h2 class="title is-3">Search compute scales, and the loop generalizes</h2>
         <div class="content has-text-justified">
           <p>
-            Agent iterations behave like a meaningful axis of curation compute. Increasing the budget
+            Agent iterations are themselves an axis of curation compute. Increasing the budget
             from 10 to 50 iterations (fixed pool, budget, recipe, and eval) keeps improving average
-            performance without a clear plateau &mdash; under open-prompting gains accumulate
-            gradually, and under the Heavy II scaffold additional iterations reduce variance and pull
+            performance without a clear plateau. Under open-prompting, gains accumulate
+            gradually; under the Heavy II scaffold, extra iterations reduce variance and pull
             the average up. This connects agentic curation to a finite-data, increasing-compute
             regime: when more raw data is unavailable or costly, extra compute can be spent searching
             over how to select, adapt, and validate the data already on hand. The framework extends
             beyond selection: a rewriting instantiation, where the agent selects examples and rewrites
             them with an external MLLM tool, reaches 34.7 (71% of the full-data gain) with a
-            Qwen3.5-9B rewriter at 20 iterations &mdash; confirming Curation-Bench supports richer data
-            actions, not just subset selection.
+            Qwen3.5-9B rewriter at 20 iterations. This shows Curation-Bench supports richer data
+            actions than subset selection alone.
           </p>
         </div>
         <div class="content has-text-centered">
