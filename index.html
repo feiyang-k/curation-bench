@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en" class="has-navbar-fixed-top">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Curation-Bench: an agent-centric benchmark asking whether generalist coding agents can automate the data-curation loop. Out-of-the-box agents match strong published baselines, but reliable data research requires scaffolded method adaptation.">
+  <meta name="keywords" content="Curation-Bench, data curation, data selection, generalist agents, coding agents, LLaVA, instruction tuning, data-centric AI, benchmark">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Can Generalist Agents Automate Data Curation?</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro|Lato:400,700"
+        rel="stylesheet">
+
+  <!-- Bulma core + Bulma extensions (carousel, slider) via CDN -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/css/bulma-carousel.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/css/bulma-slider.min.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- Academicons (ai-arxiv, etc.) -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- jQuery (used by bulma-carousel/slider init) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- Bulma extension JS via CDN -->
+  <script defer
+          src="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/js/bulma-carousel.min.js"></script>
+  <script defer
+          src="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/js/bulma-slider.min.js"></script>
+
+  <!-- Minor page-specific tweaks -->
+  <style>
+    body { font-family: 'Noto Sans', 'Lato', sans-serif; }
+    .publication-title { font-family: 'Google Sans', 'Noto Sans', sans-serif; }
+    .title, .subtitle, .navbar-link { font-family: 'Google Sans', 'Noto Sans', sans-serif; }
+    .publication-tagline {
+      max-width: 760px;
+      margin: 1.25rem auto 0 auto;
+      color: #4a4a4a;
+    }
+    .publication-links { margin-top: 1.5rem; }
+    .author-note {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      color: #555;
+    }
+    .stat-card {
+      height: 100%;
+      border: 1px solid #ededed;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .stat-card:hover {
+      box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+      transform: translateY(-2px);
+    }
+    .stat-number {
+      font-family: 'Google Sans', 'Noto Sans', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #2d6cdf;
+      line-height: 1.2;
+    }
+    .stat-label {
+      font-size: 0.92rem;
+      color: #4a4a4a;
+      margin-top: 0.5rem;
+    }
+    .figure-caption {
+      font-size: 0.92rem;
+      color: #555;
+      margin-top: 0.75rem;
+      max-width: 880px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .teaser img { border-radius: 8px; }
+    .container.is-max-desktop { max-width: 980px; }
+    pre { border-radius: 8px; }
+    /* Floating header */
+    .navbar.is-fixed-top {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: saturate(180%) blur(10px);
+      -webkit-backdrop-filter: saturate(180%) blur(10px);
+      box-shadow: 0 1px 12px rgba(0, 0, 0, 0.08);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    html { scroll-behavior: smooth; scroll-padding-top: 4rem; }
+  </style>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- ============ NAVBAR ============ -->
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu" id="navMenu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="#">
+        <span class="icon"><i class="fas fa-home"></i></span>
+      </a>
+      <a class="navbar-item" href="#abstract">Abstract</a>
+      <a class="navbar-item" href="#highlights">Highlights</a>
+      <a class="navbar-item" href="https://arxiv.org/abs/2606.04261">arXiv</a>
+      <a class="navbar-item" href="https://github.com/feiyang-k/curation-bench">Code</a>
+      <a class="navbar-item" href="#BibTeX">BibTeX</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO / TITLE + AUTHORS + AFFILIATION + LINKS ============ -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+
+          <!-- Title -->
+          <h1 class="title is-1 publication-title">Can Generalist Agents Automate Data Curation?</h1>
+
+          <!-- Tagline -->
+          <p class="is-size-5 publication-tagline">
+            An agent-centric benchmark for the data-curation loop &mdash; generalist coding agents
+            match strong published baselines out of the box, but reliable data research takes
+            scaffolded method adaptation, not open-ended prompting.
+          </p>
+
+          <!-- Author list -->
+          <div class="is-size-5 publication-authors" style="margin-top: 1.75rem;">
+            <span class="author-block">
+              <a href="mailto:fyk@vt.edu">Feiyang Kang</a><sup>1,&#42;</sup>,
+            </span>
+            <span class="author-block">
+              Hanze Li<sup>1,&#42;</sup>,
+            </span>
+            <span class="author-block">
+              Adam Nguyen<sup>1</sup>,
+            </span>
+            <span class="author-block">
+              Mahavir Dabas<sup>1</sup>,
+            </span>
+            <span class="author-block">
+              Jiaqi W. Ma<sup>2</sup>,
+            </span>
+            <span class="author-block">
+              Frederic Sala<sup>3</sup>,
+            </span>
+            <span class="author-block">
+              Dawn Song<sup>4</sup>,
+            </span>
+            <span class="author-block">
+              Ruoxi Jia<sup>1</sup>
+            </span>
+          </div>
+
+          <!-- Affiliation line -->
+          <div class="is-size-6 publication-authors" style="margin-top: 0.75rem;">
+            <span class="author-block"><sup>1</sup>Virginia Tech,&nbsp;</span>
+            <span class="author-block"><sup>2</sup>University of Illinois Urbana-Champaign,&nbsp;</span>
+            <span class="author-block"><sup>3</sup>University of Wisconsin&ndash;Madison,&nbsp;</span>
+            <span class="author-block"><sup>4</sup>University of California, Berkeley</span>
+          </div>
+
+          <!-- Equal contribution / correspondence note -->
+          <p class="author-note">
+            <sup>&#42;</sup>Equal contribution.
+            Correspondence: <a href="mailto:fyk@vt.edu">fyk@vt.edu</a>
+          </p>
+
+          <!-- Link buttons row -->
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- arXiv -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2606.04261"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- PDF -->
+              <span class="link-block">
+                <a href="https://arxiv.org/pdf/2606.04261"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- Code -->
+              <span class="link-block">
+                <a href="https://github.com/feiyang-k/curation-bench"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code</span>
+                </a>
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEASER IMAGE ============ -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/mainfig1.png"
+           alt="Agentic data curation framed as a policy-search loop, with results on 10k-example selection from LLaVA-665K."/>
+      <p class="figure-caption has-text-centered">
+        <b>Agentic data curation requires more than open-ended prompting.</b>
+        (a) Data curation framed as a policy-search loop: the agent proposes a data policy, builds
+        training data, observes feedback from fixed training and evaluation, and revises.
+        (b) On 10k-example selection from LLaVA-665K for LLaVA-1.5-7B, open-ended prompting improves
+        over random selection and human-designed baselines (ICONS, ARDS), while method-adaptation
+        scaffolding achieves the best result by adapting prior data-selection methods into a stronger policy.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HIGHLIGHTS / STAT CARDS ============ -->
+<section class="section" id="highlights" style="padding-top: 2rem;">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Highlights</h2>
+    <div class="columns is-multiline is-centered" style="margin-top: 1rem;">
+
+      <div class="column is-one-third">
+        <div class="box stat-card has-text-centered">
+          <div class="stat-number">59%</div>
+          <div class="stat-label">
+            of the full-data fine-tuning gain recovered by open-prompt Claude Code using only
+            ~1.5% of the LLaVA-665K pool (10k of 665k examples).
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="box stat-card has-text-centered">
+          <div class="stat-number">33.7 vs 28.8 &rarr; 37.1</div>
+          <div class="stat-label">
+            Claude Code best score (33.7) vs the no-fine-tuning base (28.8) and full-data
+            fine-tuning (37.1), averaged over 8 VLM benchmarks.
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="box stat-card has-text-centered">
+          <div class="stat-number">33.7 &ge; 33.3 / 33.2</div>
+          <div class="stat-label">
+            Open-prompt agents reach the human-designed baselines ICONS (33.3) and ARDS (33.2)
+            at the same 10k budget &mdash; and the best (Claude Code) exceeds them.
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="box stat-card has-text-centered">
+          <div class="stat-number">2 of 10</div>
+          <div class="stat-label">
+            Execution&ndash;research gap: in a typical open-prompt run, only ~2 of 10 iterations
+            try a new policy family &mdash; the rest are local source-ratio tuning.
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="box stat-card has-text-centered">
+          <div class="stat-number">34.9 at 1/10 data</div>
+          <div class="stat-label">
+            Heavy method-adaptation scaffold's best 10k policy (34.9) beats ICONS-100k (34.5)
+            and ARDS-100k (34.1) using one-tenth as many examples.
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="box stat-card has-text-centered">
+          <div class="stat-number">27% &rarr; 67%</div>
+          <div class="stat-label">
+            The Adapt-Papers scaffold lifts new-policy-family moves from 27% to 67%, grounded
+            iterations from 57% to 100%, and cuts shallow moves from 47% to 0%.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABSTRACT ============ -->
+<section class="section" id="abstract" style="padding-top: 1rem;">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Curating training data is among the most consequential yet labor-intensive parts of
+            modern AI development: practitioners iteratively propose, implement, evaluate, and revise
+            data policies against noisy benchmark feedback. We ask whether generalist coding agents
+            can automate this data-curation loop. We introduce Curation-Bench, an agent-centric
+            benchmark that fixes the model, training recipe, and evaluation suite while giving agents
+            command-line access to inspect data, implement policies, submit them to a fixed
+            training/evaluation pipeline, and revise. In a vision-language instruction-tuning
+            instantiation, out-of-the-box agents reach strong published data-selection baselines
+            within ten iterations. However, trajectory analysis reveals a persistent
+            execution&ndash;research gap: agents mainly tune local policy variants rather than
+            explore new policy families, even when given strategy guides and paper references.
+            Scaffolds requiring each iteration to cite, instantiate, and adapt a prior method shift
+            agents toward method-guided exploration. The scaffolded agent autonomously
+            composes&mdash;without human design input&mdash;a data-selection policy that outperforms
+            strong published baselines at one-tenth their data budget. Overall, current agents can
+            run the curation loop, but reliable data research requires scaffolded method adaptation,
+            not open-ended prompting alone.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 1: BENCHMARK ============ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">An agent-centric benchmark for the data-curation loop</h2>
+        <div class="content has-text-justified">
+          <p>
+            Data-centric benchmarks like DataComp fix the model, training recipe, and evaluation so
+            that data becomes the variable of interest &mdash; but the submitted artifact is a static
+            policy, and the benchmark never sees how that policy was discovered or revised.
+            Curation-Bench inherits DataComp's data-isolation principle but replaces static
+            submission with an interactive terminal loop: the agent inspects the candidate pool,
+            implements a curation policy, submits it to a fixed training/evaluation pipeline, observes
+            per-benchmark feedback, and revises. The harness fixes the model, optimizer, training
+            schedule, and evaluation suite (P1: data isolation), gives the agent a standard Dockerized
+            terminal workspace (P2: terminal realism), audits every submitted dataset for evaluation
+            leakage before training (P3: contamination control), and persists the full
+            trajectory &mdash; policy scripts, manifests, audit results, training outputs, and eval
+            logs under a commit hash (P4: trajectory legibility). The main instantiation is multimodal
+            instruction tuning (selecting 10k from LLaVA-665K to fine-tune LLaVA-1.5-7B, evaluated on
+            8 benchmarks), with a smaller CLIP-style DataComp pretraining setting to show the loop is
+            not limited to instruction data.
+          </p>
+        </div>
+        <div class="content has-text-centered">
+          <img src="static/images/curation-bench.png"
+               alt="Architecture of Curation-Bench: a coding agent inspects the pool, implements policies, and submits curated datasets to a fixed training-evaluation pipeline."
+               width="90%"/>
+          <p class="figure-caption">
+            <b>Architecture of Curation-Bench.</b> A coding agent inspects the candidate pool,
+            implements data policies, and submits curated datasets. The harness validates each
+            submission and scores it with a fixed training&ndash;evaluation pipeline.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 2: EXECUTORS ============ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Generalist agents are already useful executors</h2>
+        <div class="content has-text-justified">
+          <p>
+            Under open-ended prompting with no data-specific scaffolding, generalist coding agents
+            reliably run the loop. Across more than 500 iterations in 50+ sessions, agents produced
+            fewer than 10 crashed iterations not attributable to external incidents &mdash; execution
+            is effectively solved. On the primary LLaVA-665K / LLaVA-1.5-7B task, every agent beats
+            the best of 10 random runs, and most meet or exceed the published baselines ICONS (33.3)
+            and ARDS (33.2). Claude Code (Opus 4.7) performs best at 33.7 (+1.2 over the best random run),
+            recovering 59% of the full-data fine-tuning gain (base 28.8 &rarr; full 37.1) using only
+            ~1.5% of the 665k pool. Codex (GPT-5.4) reaches 33.3 and Qwen3.5-397B (OpenHands) 33.2,
+            both close to the human baselines; Kimi K2.5 (32.8) improves over random but stays just
+            below them.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 3: EXECUTION-RESEARCH GAP ============ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">The execution&ndash;research gap</h2>
+        <div class="content has-text-justified">
+          <p>
+            Strong scores mask a persistent execution&ndash;research gap. Trajectory diagnostics
+            label each iteration as introducing a new policy family, being grounded in evidence, being
+            effective, or being a shallow local adjustment. A typical open-prompt Claude Code run
+            scores well but is local and reactive: after an initial subset-balancing policy, most
+            later edits just shuffle source ratios &mdash; only 2 of 10 iterations introduce a new
+            policy family. The gap persists even when agents are given strategy lists and
+            paper-derived skill cards, indicating the bottleneck is not missing methodological
+            knowledge but a failure to operationalize it into executable policies. Light scaffolds
+            broaden the agent's vocabulary (new-policy moves rise to 43%, grounding to 70%) but do not
+            move the best outcome beyond the open-prompt maximum of 34.0.
+          </p>
+        </div>
+        <div class="content has-text-centered">
+          <img src="static/images/scaffolds_res1.png"
+               alt="Agentic data-curation results across scaffolds for Claude Code over 10 iterations on the LLaVA-1.5-7B task."
+               width="90%"/>
+          <p class="figure-caption">
+            <b>Agentic data-curation results across scaffolds</b> (Claude Code, 10 iterations;
+            LLaVA-1.5-7B fine-tuned on 10k from LLaVA-665K, 8 benchmarks). Compared to open-prompt,
+            light scaffolds reduce outcome variance but do not improve the best outcome; heavy
+            scaffolds change the outcome substantially &mdash; for better or worse depending on the
+            design, with Adapt-Papers reaching the best 34.9 policy.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 4: METHOD-ADAPTATION SCAFFOLDS ============ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Method-adaptation scaffolds unlock a better policy</h2>
+        <div class="content has-text-justified">
+          <p>
+            Heavy scaffolds that require every non-baseline iteration to cite, instantiate, and adapt
+            a prior method change what the agent actually executes. The Adapt-Papers scaffold lifts
+            new-policy-family moves from 27% to 67%, grounded iterations from 57% to 100%, and drives
+            shallow moves from 47% to 0%. After several failed adaptations, the agent autonomously
+            moves into a training-dynamics family: it composes an EL2N-style top-loss selection policy
+            with a p95 assistant-loss noise filter that removes the top ~5% noisiest responses &mdash;
+            a hybrid loss-based policy no human designed. This reaches a best 10k score of 34.9,
+            beating the open-prompt agent and the 100k non-agent baselines ICONS-100k (34.5) and
+            ARDS-100k (34.1) at one-tenth their data budget. Crucially, this scaffold has only 20%
+            locally effective iterations &mdash; fewer immediate gains &mdash; yet reaches a
+            higher-upside region of the policy space, which is exactly why trajectory diagnostics, not
+            just final scores, are needed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 5: SEARCH COMPUTE + GENERALIZATION ============ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Search compute scales, and the loop generalizes</h2>
+        <div class="content has-text-justified">
+          <p>
+            Agent iterations behave like a meaningful axis of curation compute. Increasing the budget
+            from 10 to 50 iterations (fixed pool, budget, recipe, and eval) keeps improving average
+            performance without a clear plateau &mdash; under open-prompting gains accumulate
+            gradually, and under the Heavy II scaffold additional iterations reduce variance and pull
+            the average up. This connects agentic curation to a finite-data, increasing-compute
+            regime: when more raw data is unavailable or costly, extra compute can be spent searching
+            over how to select, adapt, and validate the data already on hand. The framework extends
+            beyond selection: a rewriting instantiation, where the agent selects examples and rewrites
+            them with an external MLLM tool, reaches 34.7 (71% of the full-data gain) with a
+            Qwen3.5-9B rewriter at 20 iterations &mdash; confirming Curation-Bench supports richer data
+            actions, not just subset selection.
+          </p>
+        </div>
+        <div class="content has-text-centered">
+          <img src="static/images/it50.png"
+               alt="Ablation on the number of iterations (10 to 50) per Claude Code session, showing average performance continuing to improve."
+               width="90%"/>
+          <p class="figure-caption">
+            <b>Ablation on the number of iterations (10&ndash;50)</b> per agent session (Claude Code).
+            Average performance continues to improve across this range rather than plateauing; the
+            Heavy II scaffold finds its best score within the first 10 iterations while extra
+            iterations reduce variance and raise the average.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BIBTEX ============ -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@misc{kang2026curationbench,
+  title         = {Can Generalist Agents Automate Data Curation?},
+  author        = {Kang, Feiyang and Li, Hanze and Nguyen, Adam and Dabas, Mahavir and Ma, Jiaqi W. and Sala, Frederic and Song, Dawn and Jia, Ruoxi},
+  year          = {2026},
+  eprint        = {2606.04261},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+  url           = {https://arxiv.org/abs/2606.04261}
+}</code></pre>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://arxiv.org/pdf/2606.04261">
+        <i class="fas fa-file-pdf"></i>
+      </a>
+      <a class="icon-link" href="https://arxiv.org/abs/2606.04261">
+        <i class="ai ai-arxiv"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/feiyang-k/curation-bench" class="external-link">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content has-text-centered">
+          <p>
+            This website is built on the
+            <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project page template,
+            and is licensed under a
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            You are free to borrow the
+            <a href="https://github.com/nerfies/nerfies.github.io">source code</a>
+            of the template; we just ask that you link back to the original page in the footer.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Navbar burger toggle -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var burgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+    burgers.forEach(function (el) {
+      el.addEventListener('click', function () {
+        var target = document.getElementById(el.dataset.target);
+        el.classList.toggle('is-active');
+        target.classList.toggle('is-active');
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
