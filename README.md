@@ -1,3 +1,5 @@
+
+
 # Curation-Bench
 
 *A fixed-flow benchmark for dataset-curation agents.*
@@ -61,6 +63,7 @@ BENCHMARK.md                Agent-facing protocol (canonical text mounted into c
 AGENTS.md                   One-line pointer at BENCHMARK.md for autonomous-agent tooling
 run_prompt.md               Suite declaration: tasks + iterations + profile
 curation/                   Agent's curation code — curate.py entry point + helpers
+baselines/                  Ray-based train + eval orchestrator for VLM data curation baselines
 profiles/                   Machine-local paths (datasets, models, eval dir, env, GPUs)
   example.yaml
 configs/docker.yaml         Docker runner config (mounts, agent model/effort)
